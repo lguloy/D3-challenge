@@ -4,18 +4,19 @@
 
 //svg container dimensions
 var svgHeight = 500;
-var svgWidth = 800;
+var svgWidth = 900;
 
 var margin = {
-  top: 50,
-  right: 50,
-  bottom: 50,
+  top: 60,
+  right: 60,
+  bottom: 60,
   left: 50
 };
 
 //create chart area
 var chartHeight = svgHeight - margin.top - margin.bottom;
 var chartWidth = svgWidth - margin.left - margin.right;
+
 
 //create the scg container with the desired attributes for height and width
 var svg = d3.select("#scatter").append("svg")
@@ -76,26 +77,56 @@ d3.csv("./assets/data/data.csv").then(function(journalism) {
     
     chartGroup.append("g")
         .call(yAxis);
-      
+    
+    //create data markers
     var circles = chartGroup.selectAll("circle")
         .data(journalism)
         .enter()
         .append("circle")
-        .attr("cx", (d, i) => xScale(d.age))
-        .attr("cy", d => yScale(d.smokes))
         .attr("r", "15")
-        .style("fill", "blue")
+        .style("fill", "#0ABAAF")
         .style("opacity", ".5")
+        .style("stroke", "black")
     
-    chartGroup.selectAll("text")
+    //create data labels
+    var states = chartGroup.append("g").selectAll("text")
         .data(journalism)
         .enter()
         .append("text")
+        .style("stroke", "#0055FF")
+        .style("fill", "#0055FF")
         .text(d => d.abbr)
-        .attr("x", (d, i) => xScale(d.age)-10)
-        .attr("y", d => yScale(d.smokes)+5)
+        .attr("x", (d, i) => xScale(+d.age)-10)
+        .attr("y", d => yScale(+d.smokes)+5)
+        
+    //Axis titles
+    chartGroup.append("g").append("text")
+        .text("Age (Median)")
+        .attr("transform", `translate(${chartWidth / 2}, ${chartHeight+margin.top-20})`)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
+        .attr("fill", "black")
 
-    console.log(abbr)
+
+    chartGroup.append("g").append("text")
+        .text("% Smokes")
+        .attr("transform", `rotate(${90})`)
+        .attr("x", chartHeight/2)
+        .attr("y", margin.left)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
+        .attr("fill", "black")
+
+    //transition on page load
+    chartGroup.selectAll("circle")
+        .transition()
+        .duration(1000)
+        .attr("cx", (d, i) => xScale(+d.age))
+        .attr("cy", d => yScale(+d.smokes))
+    
+        
+
+
 
 
 });
